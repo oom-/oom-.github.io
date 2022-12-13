@@ -4,16 +4,13 @@
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.js"></script>
 
 <body>
-    <div id="main" style="width: 100%;height:800px;"></div>
+    <div id="main" style="width: 100%;height:80vh;"></div>
 </body>
 
 </html>
 <script src="./data/dataset.js"></script>
 
 <script>
-    
-   
-
     var chartDom = document.getElementById('main');
     var myChart = echarts.init(chartDom);
     var option;
@@ -30,27 +27,62 @@
                 restore: {},
                 saveAsImage: {}
             }
-        }, tooltip: {
+        },
+        tooltip: {
             trigger: 'axis',
-            position: function (pt) {
-                return [pt[0], '10%'];
+            // position: function (pt) {
+            //     return [pt[0], '10%'];
+            // },
+            formatter: (params, ticket) => {
+                let msg = params.at(0).axisValueLabel + "</br>";
+                params.forEach((param, index) => {
+                    let value = "-";
+                    if (param.value[param.seriesIndex + 1] != null) {
+                        if (param.seriesName.indexOf('server') != -1) {
+                            value = param.value[param.seriesIndex + 1] + "ms";
+                        }
+                        else if (param.seriesName.indexOf('ERROR') != -1) {
+                            value = "<b style='color:red;'>ERROR</b>";
+                        }
+                        else if (param.seriesName.indexOf('limit') != -1) {
+                            value = param.value[param.seriesIndex + 1] + "/120";
+                        }
+                    }
+                    msg += `${param.marker} ${param.seriesName}: ${value}</br>`;
+                });
+                //console.log(params, ticket);
+                return msg;
+
             }
         },
         dataZoom: [
             {
-                type: 'inside',
+                type: 'slider',
+                xAxisIndex: 0,
+                filterMode: 'none'
             },
             {
-                start: 0,
-                end: 20
+                type: 'slider',
+                yAxisIndex: 0,
+                filterMode: 'none'
+            },
+            {
+                type: 'inside',
+                xAxisIndex: 0,
+                filterMode: 'none'
+            },
+            {
+                type: 'inside',
+                yAxisIndex: 0,
+                filterMode: 'none'
             }
         ],
         xAxis: {
             type: 'category',
-            gridIndex: 0
+            gridIndex: 0,
         },
         yAxis: {
-            type: 'value'
+            type: 'value',
         },
         legend: {},
         grid: {
@@ -64,33 +96,80 @@
                 // name: 'Local server (LUX)(1)',
                 color: "blue",
                 type: 'line',
-                smooth: true,
+                // smooth: true,
                 seriesLayoutBy: 'row',
                 connectNulls: true,
+                unit: "ms",
+                animation:false,
             },
             {
                 // name: 'Local server (LUX)(2)',
                 color: "cyan",
                 type: 'line',
-                smooth: true,
+                // smooth: true,
                 seriesLayoutBy: 'row',
                 connectNulls: true,
+                unit: "ms",
+                animation:false,
             },
             {
                 // name: 'Remote server (FR)(1)',
                 color: "red",
                 type: 'line',
-                smooth: true,
+                // smooth: true,
                 seriesLayoutBy: 'row',
                 connectNulls: true,
+                animation:false,
             },
             {
                 // name: 'Remote server (FR)(2)',
                 color: "pink",
                 type: 'line',
-                smooth: true,
+                // smooth: true,
                 seriesLayoutBy: 'row',
                 connectNulls: true,
+            },
+            {
+                // name: 'Local getWallet limit status (LUX)',
+                color: "darkblue",
+                type: 'line',
+                step: 'start',
+                seriesLayoutBy: 'row',
+                connectNulls: true,
+                animation:false,
+            },
+            {
+                // name: 'Remote getWallet limit status (FRA)',
+                color: "darkred",
+                type: 'line',
+                step: 'start',
+                seriesLayoutBy: 'row',
+                connectNulls: true,
+                animation:false,
+            },
+            {
+                // name: 'Local getWallet ERROR (LUX)',
+                color: "darkviolet",
+                type: 'line',
+                seriesLayoutBy: 'row',
+                connectNulls: true,
+                symbolSize: 50,
+                symbol: "pin",
+                showSymbol: true,
+                animation:false,
+                showAllSymbol: true,
+            },
+            {
+                // name: 'Remote getWallet ERROR (FRA)',
+                color: "magenta",
+                type: 'line',
+                seriesLayoutBy: 'row',
+                connectNulls: false,
+                symbolSize: 50,
+                symbol: "pin",
+                showSymbol: true,
+                animation:false,
+                showAllSymbol: true,
             },
         ]
     };
